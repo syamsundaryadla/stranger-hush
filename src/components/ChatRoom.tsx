@@ -39,9 +39,9 @@ const generateUsername = () => {
   return `${randomAdj}${randomNoun}${randomNum}`;
 };
 
-// Generate a random user ID
+// Generate a valid UUID for anonymous users (matches DB uuid type)
 const generateUserId = () => {
-  return 'anon_' + Math.random().toString(36).substr(2, 9);
+  return crypto.randomUUID();
 };
 
 export const ChatRoom = ({ room, onLeaveRoom }: ChatRoomProps) => {
