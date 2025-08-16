@@ -64,13 +64,21 @@ export const ChatRoom = ({ room, onLeaveRoom }: ChatRoomProps) => {
   const [loading, setLoading] = useState(true);
   const [username] = useState(() => generateUsername());
   const [userId] = useState(() => generateUserId());
+  const [sessionId] = useState(() => generateUserId()); // Session ID for rate limiting
+  const [sessionCreated, setSessionCreated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchMessages();
-    subscribeToMessages();
-  }, [room.id]);
+    createSession();
+  }, []);
+
+  useEffect(() => {
+    if (sessionCreated) {
+      fetchMessages();
+      subscribeToMessages();
+    }
+  }, [room.id, sessionCreated]);
 
   useEffect(() => {
     scrollToBottom();
@@ -78,6 +86,27 @@ export const ChatRoom = ({ room, onLeaveRoom }: ChatRoomProps) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const createSession = async () => {
+    try {
+      const { error } = await supabase
+        .from('anonymous_sessions')
+        .insert({
+          session_id: sessionId,
+          username,
+        });
+
+      if (error) throw error;
+      setSessionCreated(true);
+    } catch (error) {
+      console.error('Error creating session:', error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to establish session. Please refresh the page.",
+        variant: "destructive",
+      });
+    }
   };
 
   const fetchMessages = async () => {
@@ -136,10 +165,23 @@ export const ChatRoom = ({ room, onLeaveRoom }: ChatRoomProps) => {
           room_id: room.id,
           user_id: userId,
           username,
-          content: newMessage.trim()
+          content: newMessage.trim(),
+          session_id: sessionId
         });
 
-      if (error) throw error;
+      if (error) {
+        // Handle rate limiting errors specifically
+        if (error.message.includes('row-level security')) {
+          toast({
+            title: "Rate Limited",
+            description: "Please wait a moment before sending another message",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        return;
+      }
       setNewMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
