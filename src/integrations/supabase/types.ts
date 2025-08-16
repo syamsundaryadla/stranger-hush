@@ -14,12 +14,43 @@ export type Database = {
   }
   public: {
     Tables: {
+      anonymous_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          is_banned: boolean | null
+          last_message_at: string | null
+          message_count: number | null
+          session_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_banned?: boolean | null
+          last_message_at?: string | null
+          message_count?: number | null
+          session_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_banned?: boolean | null
+          last_message_at?: string | null
+          message_count?: number | null
+          session_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
           created_at: string
           id: string
           room_id: string
+          session_id: string | null
           user_id: string
           username: string
         }
@@ -28,6 +59,7 @@ export type Database = {
           created_at?: string
           id?: string
           room_id: string
+          session_id?: string | null
           user_id: string
           username: string
         }
@@ -36,6 +68,7 @@ export type Database = {
           created_at?: string
           id?: string
           room_id?: string
+          session_id?: string | null
           user_id?: string
           username?: string
         }
@@ -81,7 +114,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_old_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
