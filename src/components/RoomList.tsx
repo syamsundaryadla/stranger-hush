@@ -65,23 +65,34 @@ export const RoomList = ({ onJoinRoom }: RoomListProps) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mb-4">
-          Anonymous Chat Rooms
+    <div className="max-w-5xl mx-auto p-6">
+      {/* Logo Section */}
+      <div className="flex flex-col items-center mb-8">
+        <img 
+          src="/stranger-hush.png" 
+          alt="Stranger Hush Logo" 
+          className="h-20 w-20 mb-4 rounded-xl shadow-md"
+        />
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+          Stranger-Hush Chat Rooms
         </h1>
-        <p className="text-muted-foreground text-lg">
-          Join themed chat rooms and connect with people who share your interests
+        <p className="text-muted-foreground text-lg mt-2 text-center max-w-xl">
+          Choose a themed room and connect instantly with people who share your vibe. 
+          Anonymous, fun, and real-time. 🚀
         </p>
       </div>
 
+      {/* Room Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {rooms.map((room) => {
           const IconComponent = themeIcons[room.theme as keyof typeof themeIcons] || MessageCircle;
           const themeColor = themeColors[room.theme as keyof typeof themeColors] || themeColors.general;
 
           return (
-            <Card key={room.id} className="hover:shadow-lg transition-shadow">
+            <Card 
+              key={room.id} 
+              className="hover:shadow-xl hover:scale-[1.02] transition-all duration-200"
+            >
               <CardHeader>
                 <div className="flex items-center gap-3 mb-2">
                   <div className={`p-2 rounded-lg ${themeColor}`}>
@@ -91,7 +102,7 @@ export const RoomList = ({ onJoinRoom }: RoomListProps) => {
                     {room.theme}
                   </Badge>
                 </div>
-                <CardTitle className="text-xl">{room.name}</CardTitle>
+                <CardTitle className="text-xl font-semibold">{room.name}</CardTitle>
                 <CardDescription>{room.description}</CardDescription>
               </CardHeader>
               <CardContent>
